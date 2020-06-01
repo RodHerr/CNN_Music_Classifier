@@ -22,6 +22,34 @@ from google.colab import drive
 drive.mount('/gdrive')
 # %cd /gdrive/My Drive/8° Semestre/Machine Learning/Projects/CNN Music Classifier
 
+"""#Background
+
+The main object of the project is to solve or approach to a solution for a conflict issue the world of music faces: the music genre classification. We have discovered that music has been in human history through all ages. However, as we are all different and constantly evolving, so does our music and it do accordingly to our time, geographical distribution, religion, politics, feelings, etc. That is what makes music somewhat hard to classify. Genres are often mis-given to songs or artist, even though they do define themselves as that specific genre, it does not quite sound to that rhythm nor notes.
+
+That is the main objective of this project: to help music world to better classify all artist works. At the same time this is one way to greatly approach to the music listeners preferences and could work as a recommendation software for some big music enterprises such as Spotify. 
+
+Music files management is quite complex, and it is somewhat expensive. That is the main issue, the file length and quality. Therefore, most software for music recognition is used within recurrent neural networks and long short-term memories. The over standing part of the project comes from Velardo’s explanation of pre-processing soundwaves and applying a convolutional neural network to obtain a nice approach relative to neural networks resources expensiveness. 
+
+To understand music, you need to understand sound. Most soundwaves are measured by time and amplitude which are relative to duration/periods and loudness. But this does not work to define what makes a piano G different from a violin G? the answer is the frequency, that is the reason why some instruments sound different even though they play at the same time and volume. Each instrument emits sounds at a different frequency and they sum within to produce the notes we desire.
+
+The way we can obtain these functions to analyze the whole sound is trough a Fourier transform. A Fourier transform is a mathematical transform which decomposes the signal into its constituent frequencies. In other words, is a complex-valued function whose magnitude represents the frequency in the original signal.
+"""
+
+from IPython.display import Image
+Image('images/Waveform.png')
+
+"""This only breaks down the sound into the various signals, but we still don't have a way to analyze the frequency. The way in which we can analyze the frequencies is by means of a spectrum to be obtained by Fast Fouriers functions. These functions show the magnitudes of the frequencies that are found within these previously fractionated waves on a periodic basis, dividing the wave analysis by time. The result can be visualized by the magnitudes of the frequencies found."""
+
+Image('images/Spectrum.png')
+
+"""Subsequently, the spectrogram is performed, which allows us to see the behavior of the frequencies over time. In this way a sample can be obtained to be able to work with the frequencies instead of the amplitudes. However, the best way we can see a spectrogram is logarithmically, so the representation of a logarithmic spectrogram is shown below."""
+
+Image('images/LogSpectrogram.png')
+
+"""The problem with this is that working with these values would result in consuming too much memory when working with logarithmic functions instead of constants. However, there is a Python library that helps with sound manipulation and that generates Mel Frequency Cepstral Coefficients. These are coefficients that are used in audio recognition. In the library there is a function that generates these constants that represent a short term of the power of the spectrum of a sound. In other words, with the constants of our spectrogram."""
+
+Image('images/MFCCs.png')
+
 """# The libraries
 Lot’s of libraries are used: os for the file’s navigation, librosa for sound manipulation, math for ceil, json for data storage, numpy for array and list manipulations and keras with tensorflow for neuran networks implementations.
 """
@@ -243,10 +271,10 @@ Everything is now ready for the implementation of the CNN. First, we need to loa
 """
 
 # Load data as Mel Frequency Cepstral Constants
-data = mfcc(dataset,data_file)
+# data = mfcc(dataset,data_file)
 
 # Get inputs, outputs and Genres names
-x,y,genres = get_data(data)
+x,y,genres = load_data("data.json")
 
 # Prepare for CNN
 xtrain,xvalid,xtest,ytrain,yvalid,ytest = prepare_datasets(x,y,0.25,0.2)
@@ -261,9 +289,9 @@ CNN.summary()
 # Compile and train CNN 
 opti = keras.optimizers.Adam(learning_rate=0.0001)
 CNN.compile(opti,"sparse_categorical_crossentropy",['accuracy'])
-CNN.fit(xtrain,ytrain,validation_data=(xvalid,yvalid),batch_size=32,epochs=50)
+CNN.fit(xtrain,ytrain,validation_data=(xvalid,yvalid),batch_size=32,epochs=50,verbose=0)
 
-"""Know, to see how it works with data it has never seen before, we evaluate the CNN with the test data."""
+"""This output is hidden, as it is too long, if you want to see the running of the training just change verbose to 1. To see how it works with data it has never seen before, we evaluate the CNN with the test data."""
 
 # Evaluate CNN with the test data
 terror,tacc = CNN.evaluate(xtest,ytest,verbose=1)
@@ -288,3 +316,8 @@ ipd.Audio(test_song)
 
 # Make a prediction with a song
 pred(CNN,test_song,genres)
+
+"""#Conclusions
+
+The whole process is too interesting, from pre-processing the samples to a one-deep arrangement. Above all, the analysis of music does not end there. As you can see many of the songs resemble more than one style of music. As part of the improvement of this project it is proposed to remove the softmax from the output layer and in this way generate a percentage output and see what genres the latter comes in. In this way it could be categorized in a better way and not focus on just one genre. In the same way, see if it does not fit into any type at all and thus be able to find a new type of music genre.
+"""
